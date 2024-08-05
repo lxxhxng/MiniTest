@@ -11,6 +11,7 @@ import org.example.miniproject_5.vo.QuizVO;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Time;
 import java.util.List;
 
 @WebServlet(value = "/examreg")
@@ -21,13 +22,6 @@ public class ExamRegController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.info("examregister GET ");
 
-
-        try {
-            Integer makeexam = ExamDAO.INSTANCE.insertExam(time,tno,title);
-            req.setAttribute("eno",makeexam);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         req.getRequestDispatcher("/WEB-INF/teacher/examReg.jsp").forward(req, resp);
     }
 
@@ -35,7 +29,8 @@ public class ExamRegController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //시험이름과 날짜를
         String title = req.getParameter("title");
-        String time = req.getParameter("time");
+        Time stime = Time.valueOf(req.getParameter("stime"));
+        Time etime = Time.valueOf(req.getParameter("etime"));
         Integer tno = null;
         Integer eno = null;
 
@@ -50,7 +45,7 @@ public class ExamRegController extends HttpServlet {
             }
         }
         try {
-            Integer makeexam = ExamDAO.INSTANCE.insertExam(time,tno,title);
+            Integer makeexam = ExamDAO.INSTANCE.insertExam(stime,etime,tno,title);
             eno = makeexam;
         } catch (Exception e) {
             throw new RuntimeException(e);

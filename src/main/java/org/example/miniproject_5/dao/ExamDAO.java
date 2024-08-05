@@ -8,6 +8,7 @@ import org.example.miniproject_5.vo.QuizVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Time;
 import java.util.List;
 
 @Log4j2
@@ -15,16 +16,17 @@ public enum ExamDAO {
 
     INSTANCE;
 
-    public Integer insertExam (String time, String tno, String title)throws Exception{
-        String sql = "insert into  tbl_e (time,tno,ename) values (?,?,?)";
+    public Integer insertExam (Time stime, Time etime, Integer tno, String title)throws Exception{
+        String sql = "insert into  tbl_e (stime,etime,tno,ename) values (?,?,?,?)";
 
         @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
         con.setAutoCommit(false);
 
         @Cleanup PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, time );
-        ps.setString(2, tno);
-        ps.setString(3, title);
+        ps.setTime(1,stime);
+        ps.setTime(2,etime);
+        ps.setInt(3,tno);
+        ps.setString(4,title);
 
         int count = ps.executeUpdate();
 
