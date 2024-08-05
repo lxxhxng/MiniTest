@@ -35,7 +35,8 @@ public class ExamRegController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //시험이름과 날짜를
         String title = req.getParameter("title");
-        String time = req.getParameter("time");
+        Time stime = Time.valueOf(req.getParameter("stime"));
+        Time etime = Time.valueOf(req.getParameter("etime"));
         Integer tno = null;
         Integer eno = null;
 

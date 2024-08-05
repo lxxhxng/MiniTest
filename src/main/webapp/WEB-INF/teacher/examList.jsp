@@ -1,13 +1,28 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: USER
+  Date: 2024-08-05
+  Time: 오후 2:17
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
     <title>Exam List</title>
 </head>
 <body>
-<h1>시험 목록</h1>
-<p>세션-tno: ${sessionScope.teacher.tno}</p>
-<p>세션-tid: ${sessionScope.teacher.tid}</p>
-<p>세션-tpw: ${sessionScope.teacher.tpw}</p>
-<!-- 시험 목록을 여기에 표시하는 코드 추가 -->
+<h1>Exam List</h1>
+<form action="examList" method="post">
+    <c:forEach var="exam" items="${examList}">
+        <ul>
+            <li>${exam.eno}</li>
+            <li>${exam.stime}</li>
+            <li>${exam.etime}</li>
+            <li>${exam.tno}</li>
+            <li>${exam.ename}</li>
+        </ul>
+    </c:forEach>
+    <button type="submit" class="btn btn-primary">REGISTER</button>
+</form>
 </body>
 </html>
