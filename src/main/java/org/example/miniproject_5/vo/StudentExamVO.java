@@ -5,13 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TeacherVO {
-
+public class StudentExamVO {
+    private Integer eno;
+    private String ename;
+    private LocalDateTime stime;
+    private LocalDateTime etime;
     private Integer tno;
-    private String tid;
-    private String tpw;
+    private boolean attended; // 응시 여부
 }
