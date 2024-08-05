@@ -23,7 +23,7 @@ public class ExamRegController extends HttpServlet {
 
 
         try {
-            Integer makeexam = ExamDAO.INSTANCE.insertExam(time,tno,title);
+            Integer makeexam = ExamDAO.INSTANCE.insertExam(stime, etime, tno,title);
             req.setAttribute("eno",makeexam);
         } catch (Exception e) {
             throw new RuntimeException(e);
