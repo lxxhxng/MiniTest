@@ -37,8 +37,8 @@ public enum ExamDAO {
         while (rs.next()) {
             ExamVO vo = ExamVO.builder()
                     .eno(rs.getInt("eno"))
-                    .stime(rs.getTimestamp("stime").toLocalDateTime())
-                    .etime(rs.getTimestamp("etime").toLocalDateTime())
+                    .stime(rs.getTime("stime"))
+                    .etime(rs.getTime("etime"))
                     .tno(rs.getInt("tno"))
                     .ename(rs.getString("ename"))
                     .build();
