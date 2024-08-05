@@ -9,6 +9,8 @@
 
 <form action="/examreg" method="post" enctype="multipart/form-data">
     <label for="file">Select Excel file:</label>
+    <input type="time" name="stime">
+    <input type="time" name="etime">
     <input type="file" id="file" name="examFile" accept=".xlsx, .xls" required>
     <br><br>
     <input type="submit" value="Upload">
