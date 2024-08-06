@@ -27,9 +27,10 @@ public class ExamListController extends HttpServlet {
             return;
         }
 
+
         // 쿠키에서 사용자 ID를 읽어오기
         Cookie[] cookies = req.getCookies();
-        String userId = null;
+        Integer tno = null;
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("teacher".equals(cookie.getName())) {

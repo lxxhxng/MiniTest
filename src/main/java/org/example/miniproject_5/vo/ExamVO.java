@@ -21,4 +21,5 @@ public class ExamVO {
     private int tno;
     private String examName;
 
+
 }
