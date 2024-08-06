@@ -49,7 +49,7 @@ public enum ExamDAO {
     }
 
     public Integer insertExam(Time startTime, Time endTime, Integer tno, String title) throws Exception {
-        String sql = "insert into tbl_e (start_time,ene_time,tno,exam_name) values (?,?,?,?)";
+        String sql = "insert into tbl_exam (start_time, end_time, tno, exam_name) values (?,?,?,?)";
 
         @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
         con.setAutoCommit(false);
@@ -85,7 +85,7 @@ public enum ExamDAO {
 
     public Boolean insertQuiz(List<QuizVO> quizList, int eno) throws Exception {
 
-        String insertSQL = "INSERT INTO tbl_q (eno, no1, text, op1, op2, op3, op4, op5, answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertSQL = "INSERT INTO tbl_question (eno, no1, text, op1, op2, op3, op4, op5, answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
 // @Cleanup 애노테이션을 사용하여 Connection 및 PreparedStatement 자원 자동 해제

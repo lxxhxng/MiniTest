@@ -29,8 +29,8 @@ public class ExamRegController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //시험이름과 날짜를
         String title = req.getParameter("title");
-        Time stime = Time.valueOf(req.getParameter("startTime"));
-        Time etime = Time.valueOf(req.getParameter("endTime"));
+        Time startTime = Time.valueOf(req.getParameter("startTime"));
+        Time endTime = Time.valueOf(req.getParameter("endTime"));
         Integer tno = null;
         Integer eno = null;
 
@@ -45,7 +45,7 @@ public class ExamRegController extends HttpServlet {
             }
         }
         try {
-            Integer makeExam = ExamDAO.INSTANCE.insertExam(stime, etime, tno, title);
+            Integer makeExam = ExamDAO.INSTANCE.insertExam(startTime, endTime, tno, title);
             eno = makeExam;
         } catch (Exception e) {
             throw new RuntimeException(e);
