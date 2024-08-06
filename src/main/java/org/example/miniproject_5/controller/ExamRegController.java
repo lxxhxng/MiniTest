@@ -37,10 +37,10 @@ public class ExamRegController extends HttpServlet {
         Integer tno = Integer.valueOf(tidcks.getValue());
 
         ExamVO examVO = ExamVO.builder()
-                .start_time(stime)
-                .end_time(etime)
+                .startTime(stime)
+                .endTime(etime)
                 .tno(tno)
-                .exam_name(title)
+                .examName(title)
                 .build();
 
         Integer eno = null;

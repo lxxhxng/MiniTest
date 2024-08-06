@@ -56,10 +56,10 @@ public enum ExamDAO {
         con.setAutoCommit(false);
 
         @Cleanup PreparedStatement ps = con.prepareStatement(sql);
-        ps.setObject(1, examVO.getStart_time());
-        ps.setObject(2, examVO.getEnd_time());
+        ps.setObject(1, examVO.getStartTime());
+        ps.setObject(2, examVO.getEndTime());
         ps.setInt(3, examVO.getTno());
-        ps.setString(4, examVO.getExam_name());
+        ps.setString(4, examVO.getExamName());
 
         int count = ps.executeUpdate();
 

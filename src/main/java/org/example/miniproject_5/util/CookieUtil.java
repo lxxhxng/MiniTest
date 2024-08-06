@@ -1,5 +1,6 @@
 package org.example.miniproject_5.util;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Arrays;
@@ -21,4 +22,18 @@ public class CookieUtil {
         return answerMap;
     }
 
+    public static Cookie getCookie(HttpServletRequest request, final String name) {
+
+        Cookie[] cookies = request.getCookies();
+        if(cookies == null || cookies.length == 0) {
+            return null;
+        }
+        for(Cookie cookie : cookies) {
+            if(cookie.getName().equals(name)) {
+                return cookie;
+            }
+        }
+        return null;
+    }
+}
 }
