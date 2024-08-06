@@ -15,10 +15,31 @@
 
 <h1>Exam Results</h1>
 
-<!-- 선택된 시험 번호 표시 -->
-<p>Exam Number: ${examNo}</p>
+<!-- 오류 메시지가 있는 경우 표시 -->
+<c:if test="${not empty error}">
+    <p style="color: red;">${error}</p>
+</c:if>
 
-<!-- 여기에 시험 결과를 표시하는 로직을 추가합니다 -->
+<!-- 선택된 시험 번호와 결과 표시 -->
+<c:if test="${not empty examNo}">
+    <p>Exam Number: ${examNo}</p>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Student Number (sno)</th>
+            <th>Score</th>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach var="result" items="${resultList}">
+            <tr>
+                <td>${result.sno}</td>
+                <td>${result.score}</td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </table>
+</c:if>
 
 </body>
 </html>

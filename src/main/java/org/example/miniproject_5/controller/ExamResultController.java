@@ -5,23 +5,51 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.miniproject_5.dao.ExamDAO;
+import org.example.miniproject_5.vo.ResultVO;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(value = "/examResult")
 public class ExamResultController extends HttpServlet {
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 요청에서 시험 번호를 가져옴
-        String examNo = request.getParameter("eno");
+        String examNoStr = req.getParameter("eno");
 
-        // 시험 번호에 대한 로직을 처리 (예: 데이터베이스에서 결과 가져오기)
+        if (examNoStr != null) {
+            try {
+                int examNo = Integer.parseInt(examNoStr);
 
-        // 결과를 request에 설정
-        request.setAttribute("examNo", examNo);
-        // 필요한 다른 데이터도 설정
+                // 데이터베이스에서 결과 목록을 가져옴
+                List<ResultVO> resultList = ExamDAO.INSTANCE.getResult(examNo);
 
-        // 결과 페이지로 포워딩
-        request.getRequestDispatcher("/WEB-INF/examResult.jsp").forward(request, response);
+                if (resultList != null && !resultList.isEmpty()) {
+                    // 결과 목록을 request에 설정
+                    req.setAttribute("examNo", examNo);
+                    req.setAttribute("resultList", resultList);
+                } else {
+                    req.setAttribute("error", "No results found for exam number: " + examNo);
+                }
+
+                // 결과 페이지로 포워딩
+                req.getRequestDispatcher("/WEB-INF/examResult.jsp").forward(req, resp);
+            } catch (NumberFormatException e) {
+                // 시험 번호가 정수가 아닌 경우
+                req.setAttribute("error", "Invalid exam number format.");
+                req.getRequestDispatcher("/WEB-INF/error.jsp").forward(req, resp);
+            } catch (Exception e) {
+                // 기타 예외 처리
+                req.setAttribute("error", e.getMessage());
+                req.getRequestDispatcher("/WEB-INF/error.jsp").forward(req, resp);
+            }
+        } else {
+            // 시험 번호가 제공되지 않은 경우
+            req.setAttribute("error", "Exam number is missing.");
+            req.getRequestDispatcher("/WEB-INF/error.jsp").forward(req, resp);
+        }
     }
 }
