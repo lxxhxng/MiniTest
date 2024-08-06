@@ -6,7 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Time;
+
+import java.time.LocalDateTime;
 
 
 @Data
@@ -16,9 +17,9 @@ import java.sql.Time;
 public class ExamVO {
 
     private Integer eno;
-    private Time stime;
-    private Time etime;
+    private LocalDateTime start_time;
+    private LocalDateTime end_time;
     private int tno;
-    private String ename;
+    private String exam_name;
 
 }

@@ -22,18 +22,19 @@ public class ExamListController extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         // 세션이 없으면 로그인 페이지로 리다이렉트
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("teacher") == null) {
             resp.sendRedirect(req.getContextPath() + "/WEB-INF/teacher/tLogin.jsp");
             return;
         }
 
+
         // 쿠키에서 사용자 ID를 읽어오기
         Cookie[] cookies = req.getCookies();
-        String userId = null;
+        Integer tno = null;
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("userId".equals(cookie.getName())) {
-                    userId = cookie.getValue();
+                if ("tid".equals(cookie.getName())) {
+                    tno = Integer.valueOf(cookie.getValue());
                     break;
                 }
             }
