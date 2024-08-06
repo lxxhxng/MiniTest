@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.time.LocalDateTime;
 
 
@@ -20,5 +21,6 @@ public class ExamVO {
     private LocalDateTime endTime;
     private int tno;
     private String examName;
+
 
 }
