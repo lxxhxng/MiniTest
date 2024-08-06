@@ -37,10 +37,10 @@ public enum ExamDAO {
         while (rs.next()) {
             ExamVO vo = ExamVO.builder()
                     .eno(rs.getInt("eno"))
-                    .start_time(rs.getTimestamp("start_time").toLocalDateTime())
-                    .end_time(rs.getTimestamp("end_time").toLocalDateTime())
+                    .startTime(rs.getTimestamp("start_time").toLocalDateTime())
+                    .endTime(rs.getTimestamp("end_time").toLocalDateTime())
                     .tno(rs.getInt("tno"))
-                    .exam_name(rs.getString("exam_name"))
+                    .examName(rs.getString("exam_name"))
                     .build();
             list.add(vo);
         }//end while
@@ -48,15 +48,15 @@ public enum ExamDAO {
         return list;
     }
 
-    public Integer insertExam(Time stime, Time etime, Integer tno, String title) throws Exception {
-        String sql = "insert into tbl_e (stime,etime,tno,ename) values (?,?,?,?)";
+    public Integer insertExam(Time startTime, Time endTime, Integer tno, String title) throws Exception {
+        String sql = "insert into tbl_e (start_time,ene_time,tno,exam_name) values (?,?,?,?)";
 
         @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
         con.setAutoCommit(false);
 
         @Cleanup PreparedStatement ps = con.prepareStatement(sql);
-        ps.setTime(1, stime);
-        ps.setTime(2, etime);
+        ps.setTime(1, startTime);
+        ps.setTime(2, endTime);
         ps.setInt(3, tno);
         ps.setString(4, title);
 
