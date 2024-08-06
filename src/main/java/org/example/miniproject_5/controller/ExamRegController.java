@@ -7,6 +7,7 @@ import jakarta.servlet.http.*;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j2;
 import org.example.miniproject_5.dao.ExamDAO;
+import org.example.miniproject_5.util.ConnectionUtil;
 import org.example.miniproject_5.util.CookieUtil;
 import org.example.miniproject_5.util.ExcelReader;
 import org.example.miniproject_5.vo.ExamVO;
@@ -15,6 +16,8 @@ import org.example.miniproject_5.vo.TeacherVO;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.List;
@@ -37,16 +40,14 @@ public class ExamRegController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.info("examregister POST ");
 
-
         // 시험 이름과 날짜를
         String title = req.getParameter("title");
         String stimeStr = req.getParameter("stime");
         String etimeStr = req.getParameter("etime");
 
-        log.info("stimeStr:" +stimeStr);
-        log.info("etimeStr:" +etimeStr);
+        log.info("stimeStr: " + stimeStr);
+        log.info("etimeStr: " + etimeStr);
 
-        log.info(title, stimeStr, etimeStr);
         if (title == null || stimeStr == null || etimeStr == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters");
             return;
@@ -65,22 +66,13 @@ public class ExamRegController extends HttpServlet {
 
         HttpSession session = req.getSession(false);
         TeacherVO teacher = (TeacherVO) session.getAttribute("teacher");
-        // TeacherVO 객체에서 tno 값을 가져옴
-        Integer tno = teacher.getTno();
 
-        // 로그로 tno 값을 출력 (또는 다른 처리)
-        log.info("Teacher TNO: " + tno);
-
-//        Cookie tidcks = CookieUtil.getCookie(req, "teacher");
-//        Integer tno = Integer.parseInt(tidcks.getValue());
-//
-//        log.info("tidcks:" +tno);
+        Integer tno = (teacher != null) ? teacher.getTno() : null;
 
         if (tno == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or invalid cookie");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or invalid teacher information");
             return;
         }
-
 
         ExamVO examVO = ExamVO.builder()
                 .startTime(stime)
@@ -88,15 +80,6 @@ public class ExamRegController extends HttpServlet {
                 .tno(tno)
                 .examName(title)
                 .build();
-
-        Integer eno = null;
-
-        try {
-            Integer makeexam = ExamDAO.INSTANCE.insertExam(examVO);
-            eno = makeexam;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
 
         Part filePart = req.getPart("examFile");
 
@@ -106,16 +89,53 @@ public class ExamRegController extends HttpServlet {
         }
 
         @Cleanup InputStream in = filePart.getInputStream();
+        Connection con = null;
 
         try {
-            List<QuizVO> quizVOList = ExcelReader.readInputStream(in);
-            log.info(quizVOList);
-            Boolean check = ExamDAO.INSTANCE.insertQuiz(quizVOList, eno);
+            // DB 연결 및 트랜잭션 시작
+            @Cleanup Connection connection = ConnectionUtil.INSTANCE.getDs().getConnection();
+            connection.setAutoCommit(false);
 
+            // 시험 데이터 삽입
+            Integer eno = ExamDAO.INSTANCE.insertExam(examVO, connection);
+
+            // 엑셀 파일로부터 문제 데이터 읽기
+            List<QuizVO> quizVOList = ExcelReader.readInputStream(in);
+
+            // 문제 데이터 삽입
+            Boolean check = ExamDAO.INSTANCE.insertQuiz(quizVOList, eno, connection);
+
+            if (!check) {
+                throw new RuntimeException("Error inserting quizzes");
+            }
+
+            // 모든 작업이 성공적으로 완료되면 트랜잭션 커밋
+            connection.commit();
             resp.sendRedirect("/teacher/examList");
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("Error processing exam and quizzes", e);
+
+            // 오류 발생 시 트랜잭션 롤백
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException se) {
+                    log.error("Error during transaction rollback", se);
+                }
+            }
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error processing request");
+        } finally {
+            // 자동 커밋을 다시 활성화
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                } catch (SQLException se) {
+                    log.error("Error setting auto-commit back to true", se);
+                }
+            }
         }
     }
+
 }
+
