@@ -50,11 +50,12 @@ public enum ExamDAO {
     }
 
     public Integer insertExam(ExamVO examVO) throws Exception {
+        log.info("insert exam start");
         String sql = "insert into tbl_exam (start_time, end_time, tno, exam_name) values (?, ?, ?, ?)";
 
         @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
         con.setAutoCommit(false);
-
+        log.info("link success");
         @Cleanup PreparedStatement ps = con.prepareStatement(sql);
         ps.setObject(1, examVO.getStartTime());
         ps.setObject(2, examVO.getEndTime());
