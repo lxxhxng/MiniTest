@@ -34,7 +34,6 @@ public class ExamListController extends HttpServlet {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("teacher".equals(cookie.getName())) {
-                    userId = cookie.getValue();
                     break;
                 }
             }

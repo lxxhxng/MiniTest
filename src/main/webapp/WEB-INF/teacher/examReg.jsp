@@ -1,4 +1,3 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
     <title>Upload Excel File</title>
@@ -7,10 +6,14 @@
 
 <h2>Upload Excel File</h2>
 
-<form action="/examreg" method="post" enctype="multipart/form-data">
+<form action="/teacher/examReg" method="post" enctype="multipart/form-data">
+    <label for="stime">Start Time:</label>
+    <input type="datetime-local" id="stime" name="stime" required>
+    <br>
+    <label for="etime">End Time:</label>
+    <input type="datetime-local" id="etime" name="etime" required>
+    <br>
     <label for="file">Select Excel file:</label>
-    <input type="datetime-local" name="stime">
-    <input type="datetime-local" name="etime">
     <input type="file" id="file" name="examFile" accept=".xlsx, .xls" required>
     <br><br>
     <input type="submit" value="Upload">

@@ -2,48 +2,78 @@ package org.example.miniproject_5.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
-import lombok.extern.log4j.Log4j2;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.example.miniproject_5.dao.StudentExamDAO;
 import org.example.miniproject_5.vo.StudentExamVO;
 import org.example.miniproject_5.vo.StudentVO;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(value = "/student/examList")
-@Log4j2
 public class StudentExamListController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
-        if (session == null || session.getAttribute("student") == null) {
-            resp.sendRedirect("/student/login");
-            return;
+
+        if (session != null && session.getAttribute("student") != null) {
+            StudentVO studentVO = (StudentVO) session.getAttribute("student");
+            Integer sno = studentVO.getSno();
+
+            try {
+                List<StudentExamVO> exams = StudentExamDAO.INSTANCE.getExams(sno);
+                List<StudentExamVO> attendedExams = new ArrayList<>();
+                List<StudentExamVO> notAttendedExams = new ArrayList<>();
+
+                for (StudentExamVO exam : exams) {
+                    if (exam.isAttended()) {
+                        attendedExams.add(exam);
+                    } else {
+                        notAttendedExams.add(exam);
+                    }
+                }
+
+                req.setAttribute("attendedExams", attendedExams);
+                req.setAttribute("notAttendedExams", notAttendedExams);
+                req.getRequestDispatcher("/WEB-INF/student/examList.jsp").forward(req, resp);
+            } catch (Exception e) {
+                throw new ServletException("Error retrieving exam list", e);
+            }
+        } else {
+            resp.sendRedirect("/student/login?error=notloggedin");
         }
+    }
 
-        Integer sno = ((StudentVO) session.getAttribute("student")).getSno();
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = req.getParameter("action");
+        String examId = req.getParameter("examId");
 
-        try {
-            List<StudentExamVO> exams = StudentExamDAO.INSTANCE.getExams(sno);
+        if (action != null && examId != null) {
+            HttpSession session = req.getSession(false);
 
-            // 응시한 시험과 미응시 시험을 분리
-            List<StudentExamVO> attendedExams = exams.stream()
-                    .filter(StudentExamVO::isAttended)
-                    .toList();
-            List<StudentExamVO> notAttendedExams = exams.stream()
-                    .filter(exam -> !exam.isAttended())
-                    .toList();
-
-            req.setAttribute("attendedExams", attendedExams);
-            req.setAttribute("notAttendedExams", notAttendedExams);
-
-            req.getRequestDispatcher("/WEB-INF/student/examList.jsp").forward(req, resp);
-
-        } catch (Exception e) {
-            log.error("Error fetching exams", e);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            if (session != null && session.getAttribute("student") != null) {
+                switch (action) {
+                    case "viewResult":
+                        resp.sendRedirect("/student/viewResult?examId=" + examId);
+                        break;
+                    case "takeExam":
+                        resp.sendRedirect("/student/takeExam?examId=" + examId);
+                        break;
+                    default:
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
+                        break;
+                }
+            } else {
+                resp.sendRedirect("/student/login?error=notloggedin");
+            }
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters");
         }
     }
 }

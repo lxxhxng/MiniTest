@@ -89,14 +89,12 @@ public enum ExamDAO {
 
         String insertSQL = "INSERT INTO tbl_question (eno, no1, text, op1, op2, op3, op4, op5, answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        // Connection 객체를 try 블록 외부에서 선언합니다.
         Connection con = null;
 
         try {
             // @Cleanup 애노테이션을 사용하여 Connection 및 PreparedStatement 자원 자동 해제
             con = ConnectionUtil.INSTANCE.getDs().getConnection();
 
-            // 자동 커밋 비활성화
             con.setAutoCommit(false);
 
             @Cleanup PreparedStatement ps = con.prepareStatement(insertSQL);
