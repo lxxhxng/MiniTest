@@ -40,6 +40,7 @@ public class ExamRegController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.info("examregister POST ");
 
+
         // 시험 이름과 날짜를
         String title = req.getParameter("title");
         String stimeStr = req.getParameter("stime");
@@ -48,6 +49,7 @@ public class ExamRegController extends HttpServlet {
         log.info("stimeStr: " + stimeStr);
         log.info("etimeStr: " + etimeStr);
 
+        log.info(title, stimeStr, etimeStr);
         if (title == null || stimeStr == null || etimeStr == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters");
             return;
@@ -66,6 +68,8 @@ public class ExamRegController extends HttpServlet {
 
         HttpSession session = req.getSession(false);
         TeacherVO teacher = (TeacherVO) session.getAttribute("teacher");
+        // TeacherVO 객체에서 tno 값을 가져옴
+        Integer tno = teacher.getTno();
 
         Integer tno = (teacher != null) ? teacher.getTno() : null;
 
@@ -74,12 +78,22 @@ public class ExamRegController extends HttpServlet {
             return;
         }
 
+
         ExamVO examVO = ExamVO.builder()
                 .startTime(stime)
                 .endTime(etime)
                 .tno(tno)
                 .examName(title)
                 .build();
+
+        Integer eno = null;
+
+        try {
+            Integer makeexam = ExamDAO.INSTANCE.insertExam(examVO);
+            eno = makeexam;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         Part filePart = req.getPart("examFile");
 
