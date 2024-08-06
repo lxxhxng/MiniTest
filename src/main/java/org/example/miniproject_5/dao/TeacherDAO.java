@@ -15,7 +15,7 @@ public enum TeacherDAO {
     public Optional<TeacherVO> get(String tid, String tpw) throws Exception {
 
         String query = """
-                SELECT * FROM tbl_t
+                SELECT * FROM tbl_teacher
                 WHERE tid = ?
                   AND tpw = ?
                 """;

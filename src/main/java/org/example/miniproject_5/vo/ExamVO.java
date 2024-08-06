@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 public class ExamVO {
 
     private Integer eno;
-    private LocalDateTime stime;
-    private LocalDateTime etime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private int tno;
-    private String ename;
+    private String examName;
 
 }

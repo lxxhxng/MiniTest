@@ -22,7 +22,7 @@ public class ExamListController extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         // 세션이 없으면 로그인 페이지로 리다이렉트
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("teacher") == null) {
             resp.sendRedirect(req.getContextPath() + "/WEB-INF/teacher/tLogin.jsp");
             return;
         }
@@ -32,7 +32,7 @@ public class ExamListController extends HttpServlet {
         String userId = null;
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("userId".equals(cookie.getName())) {
+                if ("teacher".equals(cookie.getName())) {
                     userId = cookie.getValue();
                     break;
                 }
