@@ -1,6 +1,7 @@
 package org.example.miniproject_5.controller;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import lombok.Cleanup;
@@ -10,14 +11,19 @@ import org.example.miniproject_5.util.CookieUtil;
 import org.example.miniproject_5.util.ExcelReader;
 import org.example.miniproject_5.vo.ExamVO;
 import org.example.miniproject_5.vo.QuizVO;
+import org.example.miniproject_5.vo.TeacherVO;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.Enumeration;
 import java.util.List;
 
 @WebServlet(value = "/teacher/examReg")
 @Log4j2
+@MultipartConfig(fileSizeThreshold=1024*1024*10, 	// 10 MB
+        maxFileSize=1024*1024*50,      	// 50 MB
+        maxRequestSize=1024*1024*100)
 public class ExamRegController extends HttpServlet {
 
     @Override
@@ -29,11 +35,18 @@ public class ExamRegController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        log.info("examregister POST ");
+
+
         // 시험 이름과 날짜를
         String title = req.getParameter("title");
         String stimeStr = req.getParameter("stime");
         String etimeStr = req.getParameter("etime");
 
+        log.info("stimeStr:" +stimeStr);
+        log.info("etimeStr:" +etimeStr);
+
+        log.info(title, stimeStr, etimeStr);
         if (title == null || stimeStr == null || etimeStr == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters");
             return;
@@ -50,15 +63,24 @@ public class ExamRegController extends HttpServlet {
             return;
         }
 
-        Cookie tidcks = CookieUtil.getCookie(req, "tid");
-        Integer tno = tidcks != null ? Integer.valueOf(tidcks.getValue()) : null;
+        HttpSession session = req.getSession(false);
+        TeacherVO teacher = (TeacherVO) session.getAttribute("teacher");
+        // TeacherVO 객체에서 tno 값을 가져옴
+        Integer tno = teacher.getTno();
+
+        // 로그로 tno 값을 출력 (또는 다른 처리)
+        log.info("Teacher TNO: " + tno);
+
+//        Cookie tidcks = CookieUtil.getCookie(req, "teacher");
+//        Integer tno = Integer.parseInt(tidcks.getValue());
+//
+//        log.info("tidcks:" +tno);
 
         if (tno == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or invalid cookie");
             return;
         }
 
-        log.info(title + stime + etime + tno);
 
         ExamVO examVO = ExamVO.builder()
                 .startTime(stime)
