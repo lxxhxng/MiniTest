@@ -6,15 +6,17 @@ import jakarta.servlet.http.*;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j2;
 import org.example.miniproject_5.dao.ExamDAO;
+import org.example.miniproject_5.util.CookieUtil;
 import org.example.miniproject_5.util.ExcelReader;
+import org.example.miniproject_5.vo.ExamVO;
 import org.example.miniproject_5.vo.QuizVO;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Time;
+import java.time.LocalDateTime;
 import java.util.List;
 
-@WebServlet(value = "/examreg")
+@WebServlet(value = "/teacher/examReg")
 @Log4j2
 public class ExamRegController extends HttpServlet {
 
@@ -29,24 +31,23 @@ public class ExamRegController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //시험이름과 날짜를
         String title = req.getParameter("title");
-        Time stime = Time.valueOf(req.getParameter("startTime"));
-        Time etime = Time.valueOf(req.getParameter("endTime"));
-        Integer tno = null;
+        LocalDateTime stime = LocalDateTime.parse(req.getParameter("stime"));
+        LocalDateTime etime = LocalDateTime.parse(req.getParameter("etime"));
+        Cookie tidcks = CookieUtil.getCookie(req,"tid");
+        Integer tno = Integer.valueOf(tidcks.getValue());
+
+        ExamVO examVO = ExamVO.builder()
+                .startTime(stime)
+                .endTime(etime)
+                .tno(tno)
+                .examName(title)
+                .build();
+
         Integer eno = null;
 
-        Cookie[] cookies = req.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                // 쿠키의 이름이 "tid"인지 확인
-                if ("tid".equals(cookie.getName())) {
-                    // "tid" 쿠키의 값을 반환
-                    tno = Integer.valueOf(cookie.getValue());
-                }
-            }
-        }
         try {
-            Integer makeExam = ExamDAO.INSTANCE.insertExam(stime, etime, tno, title);
-            eno = makeExam;
+            Integer makeexam = ExamDAO.INSTANCE.insertExam(examVO);
+            eno = makeexam;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -61,7 +62,7 @@ public class ExamRegController extends HttpServlet {
             log.info(quizVOList);
             Boolean check = ExamDAO.INSTANCE.insertQuiz(quizVOList, eno);
 
-            resp.sendRedirect("/examlist");
+            resp.sendRedirect("/teacher/examlist");
 
         } catch (Exception e) {
             throw new RuntimeException(e);

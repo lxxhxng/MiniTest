@@ -9,7 +9,8 @@ import org.example.miniproject_5.vo.QuizVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Time;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,17 +49,17 @@ public enum ExamDAO {
         return list;
     }
 
-    public Integer insertExam(Time startTime, Time endTime, Integer tno, String title) throws Exception {
-        String sql = "insert into tbl_e (start_time,ene_time,tno,exam_name) values (?,?,?,?)";
+    public Integer insertExam(ExamVO examVO) throws Exception {
+        String sql = "insert into tbl_exam (start_time, end_time, tno, exam_name) values (?, ?, ?, ?)";
 
         @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
         con.setAutoCommit(false);
 
         @Cleanup PreparedStatement ps = con.prepareStatement(sql);
-        ps.setTime(1, startTime);
-        ps.setTime(2, endTime);
-        ps.setInt(3, tno);
-        ps.setString(4, title);
+        ps.setObject(1, examVO.getStartTime());
+        ps.setObject(2, examVO.getEndTime());
+        ps.setInt(3, examVO.getTno());
+        ps.setString(4, examVO.getExamName());
 
         int count = ps.executeUpdate();
 
@@ -75,7 +76,7 @@ public enum ExamDAO {
         rs.next();
         Integer eno = rs.getInt(1);
 
-        log.info("TNO:........." + tno);
+        log.info("TNO:........." + examVO.getTno());
 
         con.commit();
         con.setAutoCommit(true);
@@ -83,13 +84,21 @@ public enum ExamDAO {
         return eno;
     }
 
+
     public Boolean insertQuiz(List<QuizVO> quizList, int eno) throws Exception {
 
-        String insertSQL = "INSERT INTO tbl_q (eno, no1, text, op1, op2, op3, op4, op5, answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertSQL = "INSERT INTO tbl_question (eno, no1, text, op1, op2, op3, op4, op5, answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        // Connection 객체를 try 블록 외부에서 선언합니다.
+        Connection con = null;
 
         try {
-// @Cleanup 애노테이션을 사용하여 Connection 및 PreparedStatement 자원 자동 해제
-            @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
+            // @Cleanup 애노테이션을 사용하여 Connection 및 PreparedStatement 자원 자동 해제
+            con = ConnectionUtil.INSTANCE.getDs().getConnection();
+
+            // 자동 커밋 비활성화
+            con.setAutoCommit(false);
+
             @Cleanup PreparedStatement ps = con.prepareStatement(insertSQL);
 
             for (QuizVO quiz : quizList) {
@@ -108,21 +117,44 @@ public enum ExamDAO {
 
             int[] updateCounts = ps.executeBatch(); // Batch 실행
 
-// 배치 작업 결과 확인
+            // 배치 작업 결과 확인
             for (int count : updateCounts) {
                 if (count == PreparedStatement.EXECUTE_FAILED) {
                     log.error("Failed to insert some quizzes into tbl_q table.");
+                    // 오류 발생 시 롤백
+                    con.rollback();
                     return false;
                 }
             }
 
+            // 모든 작업이 성공적으로 완료되면 트랜잭션 커밋
+            con.commit();
             log.info("Quiz data successfully inserted into tbl_q table.");
             return true;
 
         } catch (Exception e) {
             log.error("Error inserting quiz data into tbl_q table", e);
-            return false;
-        }
 
+            // 오류 발생 시 트랜잭션 롤백
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException se) {
+                    log.error("Error during transaction rollback", se);
+                }
+            }
+            return false;
+        } finally {
+            if (con != null) {
+                try {
+                    // 자동 커밋을 다시 활성화
+                    con.setAutoCommit(true);
+                } catch (SQLException se) {
+                    log.error("Error setting auto-commit back to true", se);
+                }
+            }
+        }
     }
+
+
 }
