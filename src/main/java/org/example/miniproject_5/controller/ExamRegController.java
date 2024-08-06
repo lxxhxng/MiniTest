@@ -29,12 +29,36 @@ public class ExamRegController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //시험이름과 날짜를
+        // 시험 이름과 날짜를
         String title = req.getParameter("title");
-        LocalDateTime stime = LocalDateTime.parse(req.getParameter("stime"));
-        LocalDateTime etime = LocalDateTime.parse(req.getParameter("etime"));
-        Cookie tidcks = CookieUtil.getCookie(req,"tid");
-        Integer tno = Integer.valueOf(tidcks.getValue());
+        String stimeStr = req.getParameter("stime");
+        String etimeStr = req.getParameter("etime");
+
+        if (title == null || stimeStr == null || etimeStr == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters");
+            return;
+        }
+
+        LocalDateTime stime;
+        LocalDateTime etime;
+
+        try {
+            stime = LocalDateTime.parse(stimeStr);
+            etime = LocalDateTime.parse(etimeStr);
+        } catch (Exception e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date format");
+            return;
+        }
+
+        Cookie tidcks = CookieUtil.getCookie(req, "tid");
+        Integer tno = tidcks != null ? Integer.valueOf(tidcks.getValue()) : null;
+
+        if (tno == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or invalid cookie");
+            return;
+        }
+
+        log.info(title + stime + etime + tno);
 
         ExamVO examVO = ExamVO.builder()
                 .startTime(stime)
@@ -51,21 +75,26 @@ public class ExamRegController extends HttpServlet {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
         Part filePart = req.getPart("examFile");
 
+        if (filePart == null || filePart.getInputStream() == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "No file uploaded");
+            return;
+        }
 
         @Cleanup InputStream in = filePart.getInputStream();
-
 
         try {
             List<QuizVO> quizVOList = ExcelReader.readInputStream(in);
             log.info(quizVOList);
             Boolean check = ExamDAO.INSTANCE.insertQuiz(quizVOList, eno);
 
-            resp.sendRedirect("/teacher/examlist");
+            resp.sendRedirect("/teacher/examList");
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 }
+
