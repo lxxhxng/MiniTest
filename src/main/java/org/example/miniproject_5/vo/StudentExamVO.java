@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class StudentExamVO {
     private Integer eno;
-    private String ename;
-    private LocalDateTime stime;
-    private LocalDateTime etime;
+    private String examName;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private Integer tno;
     private boolean attended; // 응시 여부
 }

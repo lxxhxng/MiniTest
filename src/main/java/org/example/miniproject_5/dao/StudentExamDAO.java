@@ -15,18 +15,19 @@ public enum StudentExamDAO {
     INSTANCE;
 
     public List<StudentExamVO> getExams(Integer sno) throws Exception {
+
         String attendedQuery = """
-                SELECT e.eno, e.ename, e.stime, e.etime, e.tno, TRUE AS attended
-                FROM tbl_e e
-                JOIN tbl_r r ON e.eno = r.eno
-                WHERE r.sno = ?
+                SELECT eno, exam_name, start_time, end_time, tno, TRUE AS attended
+                FROM tbl_exam
+                JOIN tbl_result ON exam.eno = result.eno
+                WHERE result.sno = ?
                 """;
 
         String notAttendedQuery = """
-                SELECT e.eno, e.ename, e.stime, e.etime, e.tno, FALSE AS attended
-                FROM tbl_e e
-                LEFT JOIN tbl_r r ON e.eno = r.eno AND r.sno = ?
-                WHERE r.sno IS NULL
+                SELECT eno, exam_name, start_time, end_time, tno, TRUE AS attended
+                FROM tbl_exam
+                LEFT JOIN tbl_result ON exam.eno = result.eno AND result.sno = ?
+                WHERE result.sno IS NULL
                 """;
 
         List<StudentExamVO> exams = new ArrayList<>();
@@ -41,9 +42,9 @@ public enum StudentExamDAO {
         while (rsAttended.next()) {
             StudentExamVO examVO = StudentExamVO.builder()
                     .eno(rsAttended.getInt("eno"))
-                    .ename(rsAttended.getString("ename"))
-                    .stime(rsAttended.getTimestamp("stime").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-                    .etime(rsAttended.getTimestamp("etime").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                    .examName(rsAttended.getString("ename"))
+                    .startTime(rsAttended.getTimestamp("stime").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                    .endTime(rsAttended.getTimestamp("etime").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                     .tno(rsAttended.getInt("tno"))
                     .attended(rsAttended.getBoolean("attended"))
                     .build();
@@ -58,9 +59,9 @@ public enum StudentExamDAO {
         while (rsNotAttended.next()) {
             StudentExamVO examVO = StudentExamVO.builder()
                     .eno(rsNotAttended.getInt("eno"))
-                    .ename(rsNotAttended.getString("ename"))
-                    .stime(rsNotAttended.getTimestamp("stime").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-                    .etime(rsNotAttended.getTimestamp("etime").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                    .examName(rsNotAttended.getString("ename"))
+                    .startTime(rsNotAttended.getTimestamp("stime").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                    .endTime(rsNotAttended.getTimestamp("etime").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                     .tno(rsNotAttended.getInt("tno"))
                     .attended(rsNotAttended.getBoolean("attended"))
                     .build();

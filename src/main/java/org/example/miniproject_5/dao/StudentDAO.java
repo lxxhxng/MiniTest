@@ -15,7 +15,7 @@ public enum StudentDAO {
     public Optional<StudentVO> get(String sid, String spw) throws Exception {
 
         String query = """
-                SELECT * FROM tbl_s
+                SELECT * FROM tbl_student
                 WHERE sid = ?
                   AND spw = ?
                 """;

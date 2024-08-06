@@ -26,7 +26,7 @@ public enum ExamDAO {
         String query = """
                 select
                     *
-                from tbl_e
+                from tbl_exam
                 where eno > 0""";
 
         @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
@@ -38,10 +38,10 @@ public enum ExamDAO {
         while (rs.next()) {
             ExamVO vo = ExamVO.builder()
                     .eno(rs.getInt("eno"))
-                    .stime(rs.getTimestamp("stime").toLocalDateTime())
-                    .etime(rs.getTimestamp("etime").toLocalDateTime())
+                    .startTime(rs.getTimestamp("start_time").toLocalDateTime())
+                    .endTime(rs.getTimestamp("end_time").toLocalDateTime())
                     .tno(rs.getInt("tno"))
-                    .ename(rs.getString("ename"))
+                    .examName(rs.getString("exam_name"))
                     .build();
             list.add(vo);
         }//end while
