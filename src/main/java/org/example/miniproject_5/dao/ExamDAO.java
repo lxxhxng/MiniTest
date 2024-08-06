@@ -49,7 +49,6 @@ public enum ExamDAO {
 
         return list;
     }
-
     public Integer insertExam(ExamVO examVO, Connection con) throws Exception {
         log.info("insert exam start");
         String sql = "insert into tbl_exam (start_time, end_time, tno, exam_name) values (?, ?, ?, ?)";
