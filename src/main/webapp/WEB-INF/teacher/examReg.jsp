@@ -1,12 +1,16 @@
+
 <html>
 <head>
-    <title>Upload Excel File</title>
+    <title>Upload Exam Data</title>
 </head>
 <body>
 
-<h2>Upload Excel File</h2>
+<h2>Upload Exam Data</h2>
 
 <form action="/teacher/examReg" method="post" enctype="multipart/form-data">
+    <label for="title">title:</label>
+    <input type="text" id="title" name="title">
+    <br>
     <label for="stime">Start Time:</label>
     <input type="datetime-local" id="stime" name="stime" required>
     <br>
@@ -18,6 +22,9 @@
     <br><br>
     <input type="submit" value="Upload">
 </form>
+
+</body>
+</html>
 
 </body>
 </html>
