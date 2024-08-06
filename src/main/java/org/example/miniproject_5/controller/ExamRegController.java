@@ -40,7 +40,6 @@ public class ExamRegController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.info("examregister POST ");
 
-
         // 시험 이름과 날짜를
         String title = req.getParameter("title");
         String stimeStr = req.getParameter("stime");
@@ -49,7 +48,6 @@ public class ExamRegController extends HttpServlet {
         log.info("stimeStr: " + stimeStr);
         log.info("etimeStr: " + etimeStr);
 
-        log.info(title, stimeStr, etimeStr);
         if (title == null || stimeStr == null || etimeStr == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters");
             return;
@@ -68,8 +66,6 @@ public class ExamRegController extends HttpServlet {
 
         HttpSession session = req.getSession(false);
         TeacherVO teacher = (TeacherVO) session.getAttribute("teacher");
-        // TeacherVO 객체에서 tno 값을 가져옴
-        Integer tno = teacher.getTno();
 
         Integer tno = (teacher != null) ? teacher.getTno() : null;
 
@@ -78,22 +74,12 @@ public class ExamRegController extends HttpServlet {
             return;
         }
 
-
         ExamVO examVO = ExamVO.builder()
                 .startTime(stime)
                 .endTime(etime)
                 .tno(tno)
                 .examName(title)
                 .build();
-
-        Integer eno = null;
-
-        try {
-            Integer makeexam = ExamDAO.INSTANCE.insertExam(examVO);
-            eno = makeexam;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
 
         Part filePart = req.getPart("examFile");
 
@@ -103,28 +89,28 @@ public class ExamRegController extends HttpServlet {
         }
 
         @Cleanup InputStream in = filePart.getInputStream();
+        Connection con = null;
 
-        @Cleanup Connection con = null;
         try {
             // DB 연결 및 트랜잭션 시작
-            con = ConnectionUtil.INSTANCE.getDs().getConnection();
-            con.setAutoCommit(false);
+            @Cleanup Connection connection = ConnectionUtil.INSTANCE.getDs().getConnection();
+            connection.setAutoCommit(false);
 
             // 시험 데이터 삽입
-            Integer eno = ExamDAO.INSTANCE.insertExam(examVO, con);
+            Integer eno = ExamDAO.INSTANCE.insertExam(examVO, connection);
 
             // 엑셀 파일로부터 문제 데이터 읽기
             List<QuizVO> quizVOList = ExcelReader.readInputStream(in);
 
             // 문제 데이터 삽입
-            Boolean check = ExamDAO.INSTANCE.insertQuiz(quizVOList, eno, con);
+            Boolean check = ExamDAO.INSTANCE.insertQuiz(quizVOList, eno, connection);
 
             if (!check) {
                 throw new RuntimeException("Error inserting quizzes");
             }
 
             // 모든 작업이 성공적으로 완료되면 트랜잭션 커밋
-            con.commit();
+            connection.commit();
             resp.sendRedirect("/teacher/examList");
 
         } catch (Exception e) {
