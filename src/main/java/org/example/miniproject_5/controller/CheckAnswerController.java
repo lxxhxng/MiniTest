@@ -1,4 +1,4 @@
-package org.zerock.demo1.controller;
+package org.example.miniproject_5.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
