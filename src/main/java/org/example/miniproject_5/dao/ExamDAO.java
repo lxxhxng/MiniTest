@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.example.miniproject_5.util.ConnectionUtil;
 import org.example.miniproject_5.vo.ExamVO;
 import org.example.miniproject_5.vo.QuizVO;
+import org.example.miniproject_5.vo.ResultVO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -113,6 +114,33 @@ public enum ExamDAO {
         log.info("Quiz data successfully inserted into tbl_q table.");
         return true;
     }
+
+    public List<ResultVO> getResult(int examNo) throws Exception {
+        String sql = """
+                select *
+                from tbl_result
+                where eno = ?
+                """;
+        @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
+        @Cleanup PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, examNo);
+        @Cleanup ResultSet rs = ps.executeQuery();
+
+        List<ResultVO> list = new ArrayList<>();
+
+        while (rs.next()) {
+            ResultVO result = ResultVO.builder()
+                    .rno(rs.getInt("rno"))
+                    .sno(rs.getInt("sno"))
+                    .eno(rs.getInt("eno"))
+                    .score(rs.getInt("score"))
+                    .build();
+            list.add(result);
+        }
+
+        return list;
+    }
+
 
     // 특정 시험 번호에 대한 시험 정보를 조회하는 메서드 추가
     public Optional<ExamVO> getExamById(Integer examNum) throws Exception {
