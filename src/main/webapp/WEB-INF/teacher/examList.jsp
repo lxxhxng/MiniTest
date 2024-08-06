@@ -20,10 +20,10 @@
     <c:forEach var="exam" items="${examList}">
         <ul>
             <li><a href="/examResult?eno=${exam.eno}">${exam.eno}</a></li>
-            <li>${exam.start_time}</li>
-            <li>${exam.end_time}</li>
+            <li>${exam.startTime}</li>
+            <li>${exam.endTime}</li>
             <li>${exam.tno}</li>
-            <li>${exam.exam_name}</li>
+            <li>${exam.examName}</li>
         </ul>
     </c:forEach>
 
