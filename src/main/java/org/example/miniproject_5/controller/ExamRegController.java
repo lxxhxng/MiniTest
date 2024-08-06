@@ -103,7 +103,7 @@ public class ExamRegController extends HttpServlet {
             List<QuizVO> quizVOList = ExcelReader.readInputStream(in);
 
             // 문제 데이터 삽입
-            Boolean check = ExamDAO.INSTANCE.insertQuiz(quizVOList, eno, connection);
+            Boolean check = ExamDAO.INSTANCE.insertQuiz(quizVOList, eno);
 
             if (!check) {
                 throw new RuntimeException("Error inserting quizzes");
