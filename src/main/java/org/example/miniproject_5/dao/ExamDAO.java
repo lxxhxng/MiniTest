@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.example.miniproject_5.util.ConnectionUtil;
 import org.example.miniproject_5.vo.ExamVO;
 import org.example.miniproject_5.vo.QuizVO;
+import org.example.miniproject_5.vo.ResultDetailVO;
 import org.example.miniproject_5.vo.ResultVO;
 
 import java.sql.Connection;
@@ -234,6 +235,47 @@ public enum ExamDAO {
 
     private int calculateScore(int correctAnswers, int totalQuestions) {
         return (int) ((double) correctAnswers / totalQuestions * 100); // 점수 비율을 백분율로 계산
+    }
+
+    public List<ResultDetailVO> getResultDetail(Integer eno, Integer sno) throws Exception {
+        String sql = """
+                SELECT\s
+                    q.no1, q.text, q.op1, q.op2,
+                    q.op3, q.op4, q.op5, q.answer,
+                    sa.checked_num, sa.correct
+                FROM
+                    tbl_question q
+                JOIN
+                    tbl_student_answer sa ON q.qno = sa.qno
+                WHERE
+                    q.eno = ? AND sa.sno = ?;
+                
+                """;
+        @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
+        @Cleanup PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, eno);
+        ps.setInt(2,sno);
+        @Cleanup ResultSet rs = ps.executeQuery();
+
+        List<ResultDetailVO> list = new ArrayList<>();
+
+        while (rs.next()) {
+            ResultDetailVO result = ResultDetailVO.builder()
+                    .no(rs.getInt("no1"))
+                    .question(rs.getString("text"))
+                    .op1(rs.getString("op1"))
+                    .op2(rs.getString("op2"))
+                    .op3(rs.getString("op3"))
+                    .op4(rs.getString("op4"))
+                    .op5(rs.getString("op5"))
+                    .answer(rs.getInt("answer"))
+                    .checked(rs.getInt("checked_num"))
+                    .correct(rs.getBoolean("correct"))
+                    .build();
+            list.add(result);
+        }
+
+        return list;
     }
 
 }

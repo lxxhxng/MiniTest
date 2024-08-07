@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.example.miniproject_5.dao.ExamDAO;
 import org.example.miniproject_5.vo.ResultVO;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet(value = "/examResult")
+@Log4j2
 public class ExamResultController extends HttpServlet {
 
 
@@ -51,5 +53,16 @@ public class ExamResultController extends HttpServlet {
             req.setAttribute("error", "Exam number is missing.");
             req.getRequestDispatcher("/WEB-INF/error.jsp").forward(req, resp);
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        log.info("post");
+        Integer eno = Integer.valueOf(req.getParameter("examNo"));
+        Integer sno = Integer.valueOf(req.getParameter("studentNo"));
+        log.info("eno: " + eno);
+        log.info("sno: " + sno);
+        resp.sendRedirect("/resultDetail?param1="+eno+"&param2="+sno);
+        //resp.sendRedirect(req.getContextPath()
     }
 }
