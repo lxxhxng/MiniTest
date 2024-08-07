@@ -244,22 +244,23 @@ public enum ExamDAO {
 
     public List<ResultDetailVO> getResultDetail(Integer eno, Integer sno) throws Exception {
         String sql = """
-                SELECT\s
-                    q.no1, q.text, q.op1, q.op2,
-                    q.op3, q.op4, q.op5, q.answer,
-                    sa.checked_num, sa.correct
-                FROM
-                    tbl_question q
-                JOIN
-                    tbl_student_answer sa ON q.qno = sa.qno
-                WHERE
-                    q.eno = ? AND sa.sno = ?;
-                
+                SELECT
+                q.no1, q.text, q.op1, q.op2,
+                                    q.op3, q.op4, q.op5, q.answer,
+                                    sa.checked_num, sa.correct
+                                FROM
+                                    tbl_question q
+                                JOIN
+                                    (select * from tbl_student_answer where eno=? AND sno =?) sa ON q.no1 = sa.qno
+                                WHERE
+                                    q.eno = ? AND sa.sno = ?;
                 """;
         @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
         @Cleanup PreparedStatement ps = con.prepareStatement(sql);
         ps.setInt(1, eno);
+        ps.setInt(3, eno);
         ps.setInt(2,sno);
+        ps.setInt(4,sno);
         @Cleanup ResultSet rs = ps.executeQuery();
 
         List<ResultDetailVO> list = new ArrayList<>();
