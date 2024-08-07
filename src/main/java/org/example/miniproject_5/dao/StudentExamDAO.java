@@ -4,6 +4,7 @@ import lombok.Cleanup;
 import lombok.extern.log4j.Log4j2;
 import org.example.miniproject_5.util.ConnectionUtil;
 import org.example.miniproject_5.vo.StudentExamVO;
+import org.example.miniproject_5.vo.StudentResultVO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +12,7 @@ import java.sql.ResultSet;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+
 @Log4j2
 public enum StudentExamDAO {
     INSTANCE;
@@ -72,5 +74,40 @@ public enum StudentExamDAO {
         }
         log.info("Exams retrieved: {}", exams);
         return exams;
+    }
+
+    public List<StudentResultVO> getStudentResult(Integer sno, Integer qno) throws Exception {
+
+        String query = """
+                select *
+                from tbl_student_answer
+                where qno = ?
+                  and sno = ?
+                """;
+
+        List<StudentResultVO> result = new ArrayList<>();
+
+        @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
+
+        @Cleanup PreparedStatement ps = con.prepareStatement(query);
+
+        ps.setInt(1, qno);
+        ps.setInt(2, sno);
+
+        @Cleanup ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            StudentResultVO studentResultVO = StudentResultVO.builder()
+                    .std(rs.getInt("std"))
+                    .correct(rs.getBoolean("correct"))
+                    .checkedNum(rs.getInt("checked_num"))
+                    .qno(rs.getInt("qno"))
+                    .sno(rs.getInt("sno"))
+                    .build();
+            result.add(studentResultVO);
+        }
+
+        return result;
+
     }
 }
