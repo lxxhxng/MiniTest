@@ -60,9 +60,9 @@
 
         <button type="submit" class="btn btn-custom btn-block">Login</button>
 
-        <c:if test="${param.error == 'invalid'}">
-            <p class="error-message">Invalid ID or Password</p>
-        </c:if>
+        <% if (request.getParameter("error") != null) { %>
+        <p class="error-message">아이디나 비밀번호가 유요하지 않습니다.</p>
+        <% } %>
     </form>
 </div>
 
