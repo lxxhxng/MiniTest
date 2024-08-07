@@ -23,7 +23,7 @@ public class ExamListController extends HttpServlet {
 
         // 세션이 없으면 로그인 페이지로 리다이렉트
         if (session == null || session.getAttribute("teacher") == null) {
-            resp.sendRedirect("/teacher/login");
+            resp.sendRedirect(req.getContextPath() + "/teacher/login");
             return;
         }
 
