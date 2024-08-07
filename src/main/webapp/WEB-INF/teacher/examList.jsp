@@ -60,6 +60,9 @@
         <form action="examList" method="post">
             <button type="submit" class="btn btn-register">REGISTER</button>
         </form>
+        <form action="/tlogout" method="post">
+            <button type="submit" class="btn btn-register">LOG OUT</button>
+        </form>
     </div>
 
     <h2 class="text-center mb-4">Ongoing Exams</h2>
