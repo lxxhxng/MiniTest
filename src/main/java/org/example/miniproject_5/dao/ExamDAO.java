@@ -153,7 +153,7 @@ public enum ExamDAO {
         return list;
     }
 
-    // 특정 시험 번호에 대한 시험 정보를 조회하는 메서드 추가
+    // 특정 시험 번호에 대한 시험 정보를 조회하는 메서드
     public Optional<ExamVO> getExamById(Integer examNum) throws Exception {
         String query = """
                 SELECT *
