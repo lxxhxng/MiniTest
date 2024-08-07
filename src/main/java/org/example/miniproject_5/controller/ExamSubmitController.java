@@ -62,7 +62,7 @@ public class ExamSubmitController extends HttpServlet {
             StudentAnswerDAO.INSTANCE.saveResult(sno, examNum, score);
 
             // 시험 결과 페이지로 리다이렉트
-            resp.sendRedirect("/exam/answerSheet?count=" + answers.size() + "&score=" + score);
+            resp.sendRedirect(req.getContextPath() + "/exam/result?examNum=" + examNum);
         } catch (SQLException e) {
             log.error("Error saving student answers or calculating score: ", e);
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error processing exam submission.");

@@ -72,11 +72,7 @@
         <c:forEach var="exam" items="${attendedExams}">
             <li class="exam-item">
                 <strong>${exam.examName}</strong> (Start: ${exam.startTime}, End: ${exam.endTime})
-                <form action="/student/examList" method="post" class="mt-2">
-                    <input type="hidden" name="action" value="viewResult" />
-                    <input type="hidden" name="examId" value="${exam.eno}" />
-                    <button type="submit" class="btn btn-custom">View Results</button>
-                </form>
+                <a href="${pageContext.request.contextPath}/exam/result?examNum=${exam.eno}" class="btn btn-custom mt-2">View Results</a>
             </li>
         </c:forEach>
     </ul>
