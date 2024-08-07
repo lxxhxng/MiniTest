@@ -42,16 +42,16 @@
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
-            <th>Question Number</th>
-            <th>Question</th>
-            <th>Option 1</th>
-            <th>Option 2</th>
-            <th>Option 3</th>
-            <th>Option 4</th>
-            <th>Option 5</th>
-            <th>Correct Answer</th>
-            <th>Selected Answer</th>
-            <th>Is Correct?</th>
+            <th>번호</th>
+            <th>문제</th>
+            <th>보기1</th>
+            <th>보기2</th>
+            <th>보기3</th>
+            <th>보기4</th>
+            <th>보기5</th>
+            <th>정답</th>
+            <th>선택</th>
+            <th>정답 유무</th>
         </tr>
         </thead>
         <tbody>
@@ -68,8 +68,8 @@
                 <td>${detail.checked}</td>
                 <td>
                     <span class="<c:if test='${detail.correct}'>correct-answer</c:if><c:if test='${!detail.correct}'>incorrect-answer</c:if>">
-                        <c:if test="${detail.correct}">Yes</c:if>
-                        <c:if test="${!detail.correct}">No</c:if>
+                        <c:if test="${detail.correct}">정답</c:if>
+                        <c:if test="${!detail.correct}">오답</c:if>
                     </span>
                 </td>
             </tr>
