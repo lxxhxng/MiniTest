@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +39,7 @@
     <form action="/teacher/examReg" method="post" enctype="multipart/form-data">
         <div class="form-group">
             <label for="title">Title:</label>
-            <input type="text" id="title" name="title" class="form-control" required>
+            <input type="text" id="title" name="title" class="form-control" placeholder="시험 제목" required>
         </div>
 
         <div class="form-group">
@@ -55,7 +56,7 @@
             <label for="file">Select Excel file:</label>
             <input type="file" id="file" name="examFile" class="form-control-file" accept=".xlsx, .xls" required>
         </div>
-
+        <br>
         <button type="submit" class="btn btn-custom btn-block">Upload</button>
     </form>
 </div>
