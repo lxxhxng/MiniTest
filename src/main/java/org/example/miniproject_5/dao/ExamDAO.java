@@ -180,68 +180,6 @@ public enum ExamDAO {
         return Optional.empty();
     }
 
-    public boolean saveAnswers(Integer examNum, Integer studentNum, String[] answers) throws Exception {
-        if (answers == null) {
-            throw new IllegalArgumentException("Answers array cannot be null.");
-        }
-
-        String insertAnswerSQL = "INSERT INTO tbl_student_answer (correct, checked_num, sno, qno) VALUES (?, ?, ?, ?)";
-        String getAnswerSQL = "SELECT answer FROM tbl_question WHERE qno = ?";
-        String insertResultSQL = "INSERT INTO tbl_result (sno, eno, score) VALUES (?, ?, ?)";
-
-        @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
-        @Cleanup PreparedStatement psInsertAnswer = con.prepareStatement(insertAnswerSQL);
-        @Cleanup PreparedStatement psGetAnswer = con.prepareStatement(getAnswerSQL);
-
-        int totalQuestions = 0;
-        int correctAnswers = 0;
-
-        for (String answer : answers) {
-            String[] parts = answer.split(":");
-            int qno = Integer.parseInt(parts[0]);
-            int selectedAnswer = Integer.parseInt(parts[1]);
-
-            // 문제의 정답을 조회
-            psGetAnswer.setInt(1, qno);
-            try (ResultSet rs = psGetAnswer.executeQuery()) {
-                boolean isCorrect = false;
-                if (rs.next()) {
-                    isCorrect = rs.getInt("answer") == selectedAnswer;
-                }
-
-                totalQuestions++;
-                if (isCorrect) {
-                    correctAnswers++;
-                }
-
-                // 학생의 답안 저장
-                psInsertAnswer.setBoolean(1, isCorrect);
-                psInsertAnswer.setInt(2, selectedAnswer);
-                psInsertAnswer.setInt(3, studentNum);
-                psInsertAnswer.setInt(4, qno);
-                psInsertAnswer.addBatch();
-            }
-        }
-
-        psInsertAnswer.executeBatch();
-
-        // 점수 계산 및 결과 저장
-        int score = calculateScore(correctAnswers, totalQuestions);
-        try (PreparedStatement psInsertResult = con.prepareStatement(insertResultSQL)) {
-            psInsertResult.setInt(1, studentNum);
-            psInsertResult.setInt(2, examNum);
-            psInsertResult.setInt(3, score);
-            psInsertResult.executeUpdate();
-        }
-
-        return true;
-    }
-
-
-    private int calculateScore(int correctAnswers, int totalQuestions) {
-        return (int) ((double) correctAnswers / totalQuestions * 100); // 점수 비율을 백분율로 계산
-    }
-
     public List<ResultDetailVO> getResultDetail(Integer eno, Integer sno) throws Exception {
         String sql = """
                 SELECT

@@ -9,7 +9,11 @@ import org.example.miniproject_5.vo.StudentExamVO;
 import org.example.miniproject_5.vo.StudentVO;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @WebServlet(value = "/student/examList")
@@ -37,6 +41,9 @@ public class StudentExamListController extends HttpServlet {
                     }
                 }
 
+                // 역순으로 정렬
+                attendedExams.sort(Comparator.comparing(StudentExamVO::getStartTime).reversed());
+
                 req.setAttribute("attendedExams", attendedExams);
                 req.setAttribute("notAttendedExams", notAttendedExams);
                 req.getRequestDispatcher("/WEB-INF/student/examList.jsp").forward(req, resp);
@@ -62,17 +69,40 @@ public class StudentExamListController extends HttpServlet {
                 if ("takeExam".equals(action)) {
                     // 시험 응시 상태 확인
                     boolean alreadyAttended = false;
+                    boolean isWithinTime = false;
+
                     try {
-                        alreadyAttended = StudentExamDAO.INSTANCE.getExams(sno).stream()
-                                .anyMatch(exam -> exam.getEno().equals(Integer.parseInt(examId)) && exam.isAttended());
+                        List<StudentExamVO> exams = StudentExamDAO.INSTANCE.getExams(sno);
+                        for (StudentExamVO exam : exams) {
+                            if (exam.getEno().equals(Integer.parseInt(examId))) {
+                                // 시험 응시 여부 확인
+                                alreadyAttended = exam.isAttended();
+
+                                // 시험 시간 확인
+                                LocalDateTime now = LocalDateTime.now();
+                                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+                                LocalDateTime startDateTime = exam.getStartTime();
+                                LocalDateTime endDateTime = exam.getEndTime();
+
+                                isWithinTime = now.isAfter(startDateTime) && now.isBefore(endDateTime);
+                                break;
+                            }
+                        }
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
 
                     if (alreadyAttended) {
-                        // 응시한 시험인 경우, 메시지를 설정하고 시험 목록 페이지로 리다이렉트
+                        // 이미 응시한 시험인 경우
                         req.setAttribute("message", "이미 응시한 시험입니다.");
-                        doGet(req, resp); // 재호출하여 목록 페이지로 포워딩
+                        doGet(req, resp); // 목록 페이지로 포워딩
+                        return;
+                    }
+
+                    if (!isWithinTime) {
+                        // 시험 시간이 아닌 경우
+                        req.setAttribute("message", "시험 응시 시간 외입니다.");
+                        doGet(req, resp); // 목록 페이지로 포워딩
                         return;
                     }
 
