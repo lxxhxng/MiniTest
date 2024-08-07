@@ -62,8 +62,31 @@
         </form>
     </div>
 
-    <h2 class="text-center mb-4">Exam List</h2>
+    <h2 class="text-center mb-4">Ongoing Exams</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Exam Number</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Teacher Number</th>
+            <th>Exam Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach var="exam" items="${ongoingExams}">
+            <tr>
+                <td>${exam.eno}</td>
+                <td>${exam.startTime}</td>
+                <td>${exam.endTime}</td>
+                <td>${exam.tno}</td>
+                <td>${exam.examName}</td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </table>
 
+    <h2 class="text-center mb-4">Finished Exams</h2>
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
@@ -76,7 +99,7 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach var="exam" items="${examList}">
+        <c:forEach var="exam" items="${finishedExams}">
             <tr>
                 <td>${exam.eno}</td>
                 <td>${exam.startTime}</td>

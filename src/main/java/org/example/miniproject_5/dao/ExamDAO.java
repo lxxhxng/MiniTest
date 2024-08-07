@@ -23,19 +23,21 @@ public enum ExamDAO {
     INSTANCE;
 
     // JDBC 연결 및 데이터베이스 작업
-    public List<ExamVO> getAllExams() throws Exception {
-
+    public List<List<ExamVO>> getAllExams() throws Exception {
         String query = """
                 select
                     *
                 from tbl_exam
-                where eno > 0""";
+                where eno > 0
+                order by eno desc""";
 
         @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
         @Cleanup PreparedStatement ps = con.prepareStatement(query);
         @Cleanup ResultSet rs = ps.executeQuery();
 
-        List<ExamVO> list = new ArrayList<>();
+        List<ExamVO> finishedExams = new ArrayList<>();
+        List<ExamVO> ongoingExams = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
 
         while (rs.next()) {
             ExamVO vo = ExamVO.builder()
@@ -45,10 +47,19 @@ public enum ExamDAO {
                     .tno(rs.getInt("tno"))
                     .examName(rs.getString("exam_name"))
                     .build();
-            list.add(vo);
-        }//end while
 
-        return list;
+            if (vo.getEndTime().isBefore(now)) {
+                finishedExams.add(vo);
+            } else {
+                ongoingExams.add(vo);
+            }
+        }
+
+        List<List<ExamVO>> result = new ArrayList<>();
+        result.add(finishedExams);
+        result.add(ongoingExams);
+
+        return result;
     }
 
     public Integer insertExam(ExamVO examVO, Connection con) throws Exception {

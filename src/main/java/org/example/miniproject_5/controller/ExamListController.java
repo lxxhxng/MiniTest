@@ -27,23 +27,15 @@ public class ExamListController extends HttpServlet {
             return;
         }
 
-
-        // 쿠키에서 사용자 ID를 읽어오기
-        Cookie[] cookies = req.getCookies();
-        Integer tno = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("teacher".equals(cookie.getName())) {
-                    break;
-                }
-            }
-        }
         try {
             // 시험 목록을 데이터베이스에서 조회
-            List<ExamVO> examList = ExamDAO.INSTANCE.getAllExams();
+            List<List<ExamVO>> exams = ExamDAO.INSTANCE.getAllExams();
+            List<ExamVO> finishedExams = exams.get(0);
+            List<ExamVO> ongoingExams = exams.get(1);
 
             // 시험 목록을 요청 속성에 추가
-            req.setAttribute("examList", examList);
+            req.setAttribute("finishedExams", finishedExams);
+            req.setAttribute("ongoingExams", ongoingExams);
 
             // JSP 페이지로 포워딩
             req.getRequestDispatcher("/WEB-INF/teacher/examList.jsp").forward(req, resp);
@@ -55,8 +47,6 @@ public class ExamListController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         req.getRequestDispatcher("/WEB-INF/teacher/examReg.jsp").forward(req, resp);
-
     }
 }
