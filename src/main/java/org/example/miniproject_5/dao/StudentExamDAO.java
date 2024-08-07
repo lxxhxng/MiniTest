@@ -76,38 +76,35 @@ public enum StudentExamDAO {
         return exams;
     }
 
-    public List<StudentResultVO> getStudentResult(Integer sno, Integer qno) throws Exception {
-
+    // 시험 결과를 조회하는 메서드
+    public List<StudentResultVO> getStudentResult(Integer sno, Integer examId) throws Exception {
         String query = """
-                select *
-                from tbl_student_answer
-                where qno = ?
-                  and sno = ?
+                SELECT *
+                FROM tbl_student_answer
+                WHERE sno = ? AND qno = ?
                 """;
 
         List<StudentResultVO> result = new ArrayList<>();
 
-        @Cleanup Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
+        try (Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
 
-        @Cleanup PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, sno);
+            ps.setInt(2, examId);
 
-        ps.setInt(1, qno);
-        ps.setInt(2, sno);
-
-        @Cleanup ResultSet rs = ps.executeQuery();
-
-        while (rs.next()) {
-            StudentResultVO studentResultVO = StudentResultVO.builder()
-                    .std(rs.getInt("std"))
-                    .correct(rs.getBoolean("correct"))
-                    .checkedNum(rs.getInt("checked_num"))
-                    .qno(rs.getInt("qno"))
-                    .sno(rs.getInt("sno"))
-                    .build();
-            result.add(studentResultVO);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    StudentResultVO studentResultVO = StudentResultVO.builder()
+                            .std(rs.getInt("std"))
+                            .correct(rs.getBoolean("correct"))
+                            .checkedNum(rs.getInt("checked_num"))
+                            .qno(rs.getInt("qno"))
+                            .sno(rs.getInt("sno"))
+                            .build();
+                    result.add(studentResultVO);
+                }
+            }
         }
-
         return result;
-
     }
 }
