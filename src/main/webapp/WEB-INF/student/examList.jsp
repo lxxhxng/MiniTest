@@ -48,6 +48,13 @@
 <div class="container">
     <h1 class="text-center mb-4">MINI TEST</h1>
 
+    <!-- Display error message if there is one -->
+    <c:if test="${not empty message}">
+        <div class="error-message">
+            <strong>${message}</strong>
+        </div>
+    </c:if>
+
     <h2>Not Attended Exams</h2>
     <form action="/student/examList" method="post">
         <div class="form-group">
