@@ -38,7 +38,7 @@ public class ExamResultController extends HttpServlet {
                 }
 
                 // 결과 페이지로 포워딩
-                req.getRequestDispatcher("/WEB-INF/examResult.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/student/result.jsp").forward(req, resp);
             } catch (NumberFormatException e) {
                 // 시험 번호가 정수가 아닌 경우
                 req.setAttribute("error", "Invalid exam number format.");
