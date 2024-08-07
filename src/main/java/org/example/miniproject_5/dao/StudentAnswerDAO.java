@@ -62,28 +62,31 @@ public enum StudentAnswerDAO {
 
     // 학생의 점수 계산 메서드
     public int calculateScore(int sno, int eno) throws SQLException {
-        String sql = "SELECT COUNT(*) AS score FROM tbl_student_answer sa JOIN tbl_question q ON sa.qno = q.qno WHERE sa.sno = ? AND sa.correct = TRUE AND q.eno = ?";
-        int score = 0;
+        String sql = """
+            SELECT SUM(CASE WHEN correct THEN 1 ELSE 0 END) AS score
+            FROM tbl_student_answer
+            WHERE sno = ? AND eno = ?
+            """;
 
-        try (Connection con = ConnectionUtil.INSTANCE.getDs().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection conn = ConnectionUtil.INSTANCE.getDs().getConnection();
+             PreparedStatement psmt = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, sno);
-            ps.setInt(2, eno);
+            psmt.setInt(1, sno);
+            psmt.setInt(2, eno);
 
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = psmt.executeQuery()) {
                 if (rs.next()) {
-                    score = rs.getInt("score");
+                    return rs.getInt("score");
                 }
             }
         }
 
-        return score;
+        return 0;
     }
 
     // 문제의 정답 여부 확인 메서드
     public boolean isAnswerCorrect(int qno, int checkedNum, int eno) throws SQLException {
-        String sql = "SELECT answer FROM tbl_question WHERE qno = ? AND eno = ?";
+        String sql = "SELECT answer FROM tbl_question WHERE no1 = ? AND eno = ?";
 
         try (Connection conn = ConnectionUtil.INSTANCE.getDs().getConnection();
              PreparedStatement psmt = conn.prepareStatement(sql)) {
