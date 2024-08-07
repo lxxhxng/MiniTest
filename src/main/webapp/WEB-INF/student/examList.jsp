@@ -41,6 +41,9 @@
             border-radius: 5px;
             margin-bottom: 10px;
             background-color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
@@ -48,7 +51,7 @@
 <div class="container">
     <h1 class="text-center mb-4">MINI TEST</h1>
 
-    <!-- Display error message if there is one -->
+    <!-- 에러 메시지가 있는 경우 표시 -->
     <c:if test="${not empty message}">
         <div class="error-message">
             <strong>${message}</strong>
@@ -58,7 +61,7 @@
     <h2>Not Attended Exams</h2>
     <form action="/student/examList" method="post">
         <div class="form-group">
-            <label for="examId">Enter Exam ID to attend:</label>
+            <label for="examId">Enter Exam ID to attend::</label>
             <input type="text" id="examId" name="examId" class="form-control" required />
         </div>
         <input type="hidden" name="action" value="takeExam" />
@@ -71,15 +74,17 @@
     <ul class="list-unstyled">
         <c:forEach var="exam" items="${attendedExams}">
             <li class="exam-item">
-                <strong>${exam.examName}</strong> (Start: ${exam.startTime}, End: ${exam.endTime})
-                <a href="${pageContext.request.contextPath}/exam/result?examNum=${exam.eno}" class="btn btn-custom mt-2">View Results</a>
+                <div>
+                    <strong>${exam.examName}</strong> (Start: ${exam.startTime}, End: ${exam.endTime})
+                </div>
+                <a href="${pageContext.request.contextPath}/exam/result?examNum=${exam.eno}" class="btn btn-custom ml-2">View Results</a>
             </li>
         </c:forEach>
     </ul>
 
 </div>
 
-<!-- Bootstrap JS and dependencies -->
+<!-- Bootstrap JS 및 종속성 -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.10/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

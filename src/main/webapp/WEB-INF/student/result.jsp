@@ -22,17 +22,23 @@
         .result {
             margin-bottom: 20px;
         }
-        .answer-list {
-            list-style-type: none;
-            padding: 0;
+        .result h3 {
+            margin: 0;
         }
-        .answer-list li {
-            margin-bottom: 10px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        .answer-list input {
+        table, th, td {
             border: 1px solid #ccc;
-            padding: 5px;
-            font-size: 16px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f3e8c2;
         }
         .btn-custom {
             background-color: #f3e8c2;
@@ -58,20 +64,31 @@
         <h3>Your Score: ${score}</h3>
     </div>
     <div class="title">Your Answers</div>
-    <ul class="answer-list">
+    <table>
+        <thead>
+        <tr>
+            <th>Question No</th>
+            <th>Your Answer</th>
+            <th>Result</th>
+        </tr>
+        </thead>
+        <tbody>
         <c:forEach items="${answerList}" var="answer">
-            <li>
-                Question ${answer.qno}:
-                <input type="text" readonly value="${answer.checkedNum}" />
-                <c:if test="${answer.correct}">
-                    (Correct)
-                </c:if>
-                <c:if test="${!answer.correct}">
-                    (Incorrect)
-                </c:if>
-            </li>
+            <tr>
+                <td>${answer.qno}</td>
+                <td><input type="text" readonly value="${answer.checkedNum}" /></td>
+                <td>
+                    <c:if test="${answer.correct}">
+                        Correct
+                    </c:if>
+                    <c:if test="${!answer.correct}">
+                        Incorrect
+                    </c:if>
+                </td>
+            </tr>
         </c:forEach>
-    </ul>
+        </tbody>
+    </table>
 
     <!-- 시험 목록으로 돌아가기 -->
     <a href="${pageContext.request.contextPath}/student/examList" class="btn-custom">Back to Exam List</a>
