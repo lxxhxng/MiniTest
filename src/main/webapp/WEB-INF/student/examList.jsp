@@ -28,6 +28,16 @@
             background-color: #f6e5ae;
             color: #333;
         }
+
+        .btn-register {
+            background-color: #f3e8c2; /* Custom color for REGISTER button */
+            color: white;
+        }
+        .btn-register:hover {
+            background-color: #f6e5ae; /* Darker color on hover */
+            color: white;
+        }
+
         .form-group label {
             font-weight: bold;
         }
@@ -54,7 +64,9 @@
             <strong>${message}</strong>
         </div>
     </c:if>
-
+    <form action="/slogout" method="post">
+        <button type="submit" class="btn btn-register">LOG OUT</button>
+    </form>
     <h2>Not Attended Exams</h2>
     <form action="/student/examList" method="post">
         <div class="form-group">
