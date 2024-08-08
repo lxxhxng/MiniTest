@@ -27,5 +27,7 @@ public class TeacherFilter implements Filter {
             return;
         }
 
+        filterChain.doFilter(servletRequest, servletResponse);
+
     }
 }

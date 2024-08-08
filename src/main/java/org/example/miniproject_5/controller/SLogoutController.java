@@ -19,7 +19,7 @@ public class SLogoutController extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         if (session != null) {
-            // 세션에 'teacher' 속성이 있는 경우 삭제합니다.
+            // 세션에 'student' 속성이 있는 경우 삭제합니다.
             session.removeAttribute("student");
         }
 

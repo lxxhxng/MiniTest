@@ -27,5 +27,7 @@ public class StudentFilter implements Filter {
             return;
         }
 
+        filterChain.doFilter(servletRequest, servletResponse);
+
     }
 }
